@@ -1,8 +1,11 @@
 package com.udacity.asteroidradar.api
 
+import androidx.annotation.WorkerThread
 import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import org.json.JSONObject
+import retrofit2.Retrofit
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -57,4 +60,23 @@ fun getNextSevenDaysFormattedDates(): List<String> {
         calendar.add(Calendar.DAY_OF_YEAR, 1)
     }
     return formattedDateList
+}
+
+@WorkerThread
+suspend fun getAsteroidsFromWeb(startDate: String, endDate: String): List<Asteroid> {
+    val retrofit = Retrofit.Builder()
+        .baseUrl(Constants.BASE_URL)
+        .addConverterFactory(ScalarsConverterFactory.create())
+        .build()
+    val service = retrofit.create(AsteroidService::class.java)
+    val serviceData = service.getAsteroids(
+        startDate
+        , endDate
+        , Constants.API_KEY
+    ).body()
+
+    return if (serviceData != null) {
+        parseAsteroidsJsonResult(JSONObject(serviceData))
+    } else
+        emptyList()
 }

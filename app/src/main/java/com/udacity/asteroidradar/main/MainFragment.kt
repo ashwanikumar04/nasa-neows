@@ -3,21 +3,28 @@ package com.udacity.asteroidradar.main
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import android.widget.Toast
+import android.widget.Toast.LENGTH_SHORT
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.squareup.picasso.Picasso
+import androidx.work.*
 import com.udacity.asteroidradar.Asteroid
+import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.R
+import com.udacity.asteroidradar.data.AsteroidDataDownloader
+import com.udacity.asteroidradar.data.AsteroidDataDownloader.Companion.WORK_RESULT
+import com.udacity.asteroidradar.data.MoshiUtil.Companion.deserialize
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 import com.udacity.asteroidradar.vm.SharedViewModel
+import java.time.Duration
+import java.util.concurrent.TimeUnit
 
+//Reference https://medium.com/androiddevelopers/workmanager-periodicity-ff35185ff006
 class MainFragment : Fragment(),
     AsteroidAdapter.AsteroidItemListener {
 
@@ -38,6 +45,7 @@ class MainFragment : Fragment(),
         binding.asteroidRecycler.layoutManager = LinearLayoutManager(requireContext())
         viewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
         binding.todayImage = viewModel.todayImage.value
+        adapter = AsteroidAdapter(emptyList(), this)
         viewModel.asteroidData.observe(requireActivity(), Observer {
             adapter = AsteroidAdapter(it, this)
             binding.asteroidRecycler.adapter = adapter
@@ -49,6 +57,34 @@ class MainFragment : Fragment(),
                 binding.executePendingBindings()
             }
         })
+
+        val constraints = Constraints.Builder()
+            .setRequiresCharging(true)
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+
+        val workManager = WorkManager.getInstance(requireActivity().application)
+
+        val workRequest = PeriodicWorkRequest.Builder(
+            AsteroidDataDownloader::class.java,
+            1,
+            TimeUnit.DAYS
+        )
+            .setInitialDelay(1, TimeUnit.MILLISECONDS)
+            .setConstraints(constraints)
+            .addTag(Constants.DOWNLOADER_TAG)
+            .build()
+
+        workManager.enqueueUniquePeriodicWork(
+            Constants.DOWNLOADER_TAG,
+            ExistingPeriodicWorkPolicy.KEEP, workRequest
+        )
+
+        workManager.getWorkInfoByIdLiveData(workRequest.id)
+            .observe(requireActivity(), Observer {
+                viewModel.fetchAll()
+            })
 
         return binding.root
     }

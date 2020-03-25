@@ -1,6 +1,5 @@
 package com.udacity.asteroidradar.data
 
-import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import androidx.annotation.WorkerThread
@@ -12,19 +11,16 @@ import com.udacity.asteroidradar.Constants.BASE_URL
 import com.udacity.asteroidradar.TodayImage
 import com.udacity.asteroidradar.api.AsteroidService
 import com.udacity.asteroidradar.api.getNextSevenDaysFormattedDates
-import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
-import retrofit2.converter.scalars.ScalarsConverterFactory
 import java.text.SimpleDateFormat
 import java.util.*
 
 
-class AsteroidRepository(val app: Application) {
+class AsteroidRepository(val app: Context) {
     val todayImage = MutableLiveData<TodayImage>()
     val asteroidData = MutableLiveData<List<Asteroid>>()
     private val asteroidDao = AsteroidDatabase.getDatabase(app)
@@ -39,36 +35,10 @@ class AsteroidRepository(val app: Application) {
         todayImage.value = TodayImage("", "", "")
         CoroutineScope(Dispatchers.IO).launch {
             val data = asteroidDao.getAll(startDate)
-            if (data.isEmpty()) {
-                getAsteroids(startDate, endDate)
-            } else {
+            if (data.isNotEmpty()) {
                 asteroidData.postValue(data)
             }
             getTodayImage()
-        }
-    }
-
-    @WorkerThread
-    suspend fun getAsteroids(startDate: String, endDate: String) {
-        if (networkAvailable()) {
-            val retrofit = Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .build()
-            val service = retrofit.create(AsteroidService::class.java)
-            val serviceData = service.getAsteroids(
-                startDate
-                , endDate
-                , API_KEY
-            ).body()
-
-            val asteroids: List<Asteroid> = if (serviceData != null) {
-                parseAsteroidsJsonResult(JSONObject(serviceData))
-            } else
-                emptyList()
-            asteroidData.postValue(asteroids)
-            asteroidDao.deleteAll()
-            asteroidDao.addAll(asteroids)
         }
     }
 
