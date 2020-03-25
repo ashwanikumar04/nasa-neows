@@ -15,14 +15,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginBottom="@dimen/margin_16"
+        android:layout_margin="@dimen/margin_8"
         android:elevation="4dp"
         app:cardBackgroundColor="#000000"
         app:cardElevation="4dp">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:background="@drawable/asteroid_item_click"
+            android:padding="@dimen/margin_4">
 
             <TextView
                 android:id="@+id/name"

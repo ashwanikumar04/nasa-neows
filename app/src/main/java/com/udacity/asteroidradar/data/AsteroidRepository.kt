@@ -38,7 +38,6 @@ class AsteroidRepository(val app: Application) {
         endDate = sevenDays[6]
         todayImage.value = TodayImage("", "", "")
         CoroutineScope(Dispatchers.IO).launch {
-
             val data = asteroidDao.getAll(startDate)
             if (data.isEmpty()) {
                 getAsteroids(startDate, endDate)
@@ -113,7 +112,6 @@ class AsteroidRepository(val app: Application) {
     fun fetchCurrentWeek() {
         CoroutineScope(Dispatchers.IO).launch {
             val weekend = getWeekEnd();
-
             val data = asteroidDao.getByRange(startDate, weekend ?: startDate)
             asteroidData.postValue(data)
         }
