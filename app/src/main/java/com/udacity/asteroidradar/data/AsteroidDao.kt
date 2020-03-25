@@ -6,10 +6,11 @@ import androidx.room.Query
 import com.udacity.asteroidradar.Asteroid
 
 @Dao
+/// Reference https://androidkt.com/datetime-datatype-sqlite-using-room/
 interface AsteroidDao {
 
-    @Query("SELECT * from asteroid")
-    fun getAll(): List<Asteroid>
+    @Query("SELECT * from asteroid where date(closeApproachDate) >= date(:startDate) ORDER BY date(closeApproachDate) asc")
+    fun getAll(startDate: String): List<Asteroid>
 
     @Insert
     suspend fun add(asteroid: Asteroid)

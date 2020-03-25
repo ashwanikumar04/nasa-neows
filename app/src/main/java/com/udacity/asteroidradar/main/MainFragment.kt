@@ -32,7 +32,6 @@ class MainFragment : Fragment() {
         binding.asteroidRecycler.layoutManager = LinearLayoutManager(requireContext())
         viewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
         viewModel.asteroidData.observe(requireActivity(), Observer {
-            Log.d("Test", it.toString())
             adapter = AsteroidAdapter(it)
             binding.asteroidRecycler.adapter = adapter
         })

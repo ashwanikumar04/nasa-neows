@@ -3,13 +3,14 @@ package com.udacity.asteroidradar.data
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
-import android.util.Log
 import android.widget.Toast
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.MutableLiveData
 import com.udacity.asteroidradar.Asteroid
+import com.udacity.asteroidradar.Constants.API_KEY
 import com.udacity.asteroidradar.Constants.BASE_URL
 import com.udacity.asteroidradar.api.AsteroidService
+import com.udacity.asteroidradar.api.getNextSevenDaysFormattedDates
 import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -28,9 +29,13 @@ class AsteroidRepository(val app: Application) {
 
     init {
         CoroutineScope(Dispatchers.IO).launch {
-            val data = asteroidDao.getAll()
+            val sevenDays = getNextSevenDaysFormattedDates()
+            val startDate = sevenDays[0]
+            val endDate = sevenDays[6]
+
+            val data = asteroidDao.getAll(startDate)
             if (data.isEmpty()) {
-                callWebService()
+                callWebService(startDate, endDate)
             } else {
                 asteroidData.postValue(data)
             }
@@ -38,7 +43,7 @@ class AsteroidRepository(val app: Application) {
     }
 
     @WorkerThread
-    suspend fun callWebService() {
+    suspend fun callWebService(startDate: String, endDate: String) {
         if (networkAvailable()) {
             withContext(Dispatchers.Main) {
                 Toast.makeText(app, "Using remote data", Toast.LENGTH_LONG).show()
@@ -49,9 +54,9 @@ class AsteroidRepository(val app: Application) {
                 .build()
             val service = retrofit.create(AsteroidService::class.java)
             val serviceData = service.getAsteroids(
-                "2020-03-24",
-                "2020-03-31",
-                "dk6RpNjhnI9EnOIk86NfJosQBIh4RKjXSD9JFdN8"
+                startDate
+                , endDate
+                , API_KEY
             ).body()
 
             val asteroids: List<Asteroid> = if (serviceData != null) {
@@ -74,7 +79,7 @@ class AsteroidRepository(val app: Application) {
 
     fun refreshDataFromWeb() {
         CoroutineScope(Dispatchers.IO).launch {
-            callWebService()
+            // callWebService(startDate, endDate)
         }
     }
 }
