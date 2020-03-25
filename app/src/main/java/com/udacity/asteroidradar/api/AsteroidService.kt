@@ -1,5 +1,6 @@
 package com.udacity.asteroidradar.api
 
+import com.udacity.asteroidradar.TodayImage
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -11,4 +12,9 @@ interface AsteroidService {
         @Query("end_date") endDate: String,
         @Query("api_key") apiKey: String
     ): Response<String>
+
+    @GET("/planetary/apod")
+    suspend fun getTodayImage(
+        @Query("api_key") apiKey: String
+    ): Response<TodayImage>
 }

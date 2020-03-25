@@ -6,8 +6,8 @@
     <data>
 
         <variable
-            name="viewModel"
-            type="com.udacity.asteroidradar.main.MainViewModel" />
+            name="todayImage"
+            type="com.udacity.asteroidradar.TodayImage" />
 
     </data>
 
@@ -29,7 +29,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:adjustViewBounds="true"
+                android:contentDescription="@{String.format(@string/nasa_picture_of_day_content_description_format, todayImage.title)}"
                 android:scaleType="centerCrop"
+                app:imageUrl="@{todayImage.url}"
                 app:srcCompat="@drawable/placeholder_picture_of_day" />
 
             <TextView

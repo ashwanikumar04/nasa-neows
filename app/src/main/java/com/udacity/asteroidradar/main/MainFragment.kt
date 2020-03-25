@@ -11,6 +11,7 @@ import androidx.navigation.NavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 import com.udacity.asteroidradar.vm.SharedViewModel
@@ -27,13 +28,20 @@ class MainFragment : Fragment() {
     ): View? {
         val binding = FragmentMainBinding.inflate(inflater)
         binding.lifecycleOwner = this
-
         setHasOptionsMenu(true)
         binding.asteroidRecycler.layoutManager = LinearLayoutManager(requireContext())
         viewModel = ViewModelProvider(requireActivity()).get(SharedViewModel::class.java)
+        binding.todayImage = viewModel.todayImage.value
         viewModel.asteroidData.observe(requireActivity(), Observer {
             adapter = AsteroidAdapter(it)
             binding.asteroidRecycler.adapter = adapter
+        })
+
+        viewModel.todayImage.observe(requireActivity(), Observer {
+            if ("image" == it.mediaType) {
+                binding.todayImage = it
+                binding.executePendingBindings()
+            }
         })
 
         return binding.root
@@ -45,6 +53,17 @@ class MainFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.show_week -> {
+                viewModel.fetchCurrentWeek()
+            }
+            R.id.show_today -> {
+                viewModel.fetchTodayAsteroids()
+            }
+            R.id.show_all -> {
+                viewModel.fetchAll()
+            }
+        }
         return true
     }
 }

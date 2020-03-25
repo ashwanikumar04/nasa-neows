@@ -9,10 +9,19 @@ import com.udacity.asteroidradar.data.AsteroidRepository
 class SharedViewModel(val app: Application) : AndroidViewModel(app) {
     private val dataRepo = AsteroidRepository(app)
     val asteroidData = dataRepo.asteroidData
+    val todayImage = dataRepo.todayImage
 
     val selectedAsteroid = MutableLiveData<Asteroid>()
 
-    fun refreshData() {
-        dataRepo.refreshDataFromWeb()
+    fun fetchTodayAsteroids() {
+        dataRepo.fetchTodayAsteroids()
+    }
+
+    fun fetchAll() {
+        dataRepo.fetchAll()
+    }
+
+    fun fetchCurrentWeek() {
+        dataRepo.fetchCurrentWeek()
     }
 }
