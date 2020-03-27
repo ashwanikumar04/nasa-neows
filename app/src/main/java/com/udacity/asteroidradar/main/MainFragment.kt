@@ -1,14 +1,10 @@
 package com.udacity.asteroidradar.main
 
 import android.os.Bundle
-import android.util.Log
 import android.view.*
-import android.widget.Toast
-import android.widget.Toast.LENGTH_SHORT
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,11 +13,8 @@ import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.data.AsteroidDataDownloader
-import com.udacity.asteroidradar.data.AsteroidDataDownloader.Companion.WORK_RESULT
-import com.udacity.asteroidradar.data.MoshiUtil.Companion.deserialize
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 import com.udacity.asteroidradar.vm.SharedViewModel
-import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 //Reference https://medium.com/androiddevelopers/workmanager-periodicity-ff35185ff006

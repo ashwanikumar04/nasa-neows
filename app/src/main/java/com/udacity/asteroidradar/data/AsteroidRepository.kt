@@ -8,7 +8,7 @@ import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.Constants
 import com.udacity.asteroidradar.Constants.API_KEY
 import com.udacity.asteroidradar.Constants.BASE_URL
-import com.udacity.asteroidradar.TodayImage
+import com.udacity.asteroidradar.PictureOfDay
 import com.udacity.asteroidradar.api.AsteroidService
 import com.udacity.asteroidradar.api.getNextSevenDaysFormattedDates
 import kotlinx.coroutines.CoroutineScope
@@ -21,7 +21,7 @@ import java.util.*
 
 
 class AsteroidRepository(val app: Context) {
-    val todayImage = MutableLiveData<TodayImage>()
+    val todayImage = MutableLiveData<PictureOfDay>()
     val asteroidData = MutableLiveData<List<Asteroid>>()
     private val asteroidDao = AsteroidDatabase.getDatabase(app)
         .asteroidDao()
@@ -32,7 +32,7 @@ class AsteroidRepository(val app: Context) {
         val sevenDays = getNextSevenDaysFormattedDates()
         startDate = sevenDays[0]
         endDate = sevenDays[6]
-        todayImage.value = TodayImage("", "", "")
+        todayImage.value = PictureOfDay("", "", "")
         CoroutineScope(Dispatchers.IO).launch {
             val data = asteroidDao.getAll(startDate)
             if (data.isNotEmpty()) {
@@ -81,7 +81,7 @@ class AsteroidRepository(val app: Context) {
 
     fun fetchCurrentWeek() {
         CoroutineScope(Dispatchers.IO).launch {
-            val weekend = getWeekEnd();
+            val weekend = getWeekEnd()
             val data = asteroidDao.getByRange(startDate, weekend ?: startDate)
             asteroidData.postValue(data)
         }

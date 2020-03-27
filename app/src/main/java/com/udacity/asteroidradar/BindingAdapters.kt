@@ -39,3 +39,21 @@ fun bindTextViewToDisplayVelocity(textView: TextView, number: Double) {
     val context = textView.context
     textView.text = String.format(context.getString(R.string.km_s_unit_format), number)
 }
+
+@BindingAdapter("contentDescription")
+fun bindPictureOfDayContentDescription(imageView: ImageView, title: String) {
+    val context = imageView.context
+    if (title.isBlank()) {
+        imageView.contentDescription =
+            context.getString(R.string.this_is_nasa_s_picture_of_day_showing_nothing_yet)
+    } else {
+        imageView.contentDescription = String.format(
+            context.getString(R.string.nasa_picture_of_day_content_description_format),
+            title
+        )
+    }
+}
+
+
+
+
